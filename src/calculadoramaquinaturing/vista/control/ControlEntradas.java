@@ -53,19 +53,4 @@ public class ControlEntradas {
     }
     
     
-    
-    public String darResultado(int op, int num1, int num2){
-        String res = "";
-        int res_num;
-        switch(op){
-            case 1:
-                res_num = num1 + num2;
-                for(int i = 0; i<res_num; i++){
-                    res += "1";
-                }
-                break;
-        }
-        
-        return res;
-    }//Fin de la funcion dar resultados
 }

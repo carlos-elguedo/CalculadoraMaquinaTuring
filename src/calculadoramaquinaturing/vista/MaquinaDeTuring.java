@@ -5,10 +5,8 @@
  */
 package calculadoramaquinaturing.vista;
 
-import calculadoramaquinaturing.vista.control.ControlEntradas;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 
@@ -18,35 +16,14 @@ import javax.swing.JPanel;
  */
 public class MaquinaDeTuring extends JPanel{
     
-    private ControlEntradas controlEntradas;
     private String CADENA;
     private String OPERACION, CAD1, CAD2;
     private int NUMERO_1, NUMERO_2, RESPUESTA, RESIDUO;
     private boolean CINTA_VACIA = false;
-    private boolean PINTAR_CINTA_EN_BLANCO = false;
-    
     private int anchoVentana = 1000, altoventana = 600;
-    private int anchoCuadro, altoCuadro;
     private int NUMERO_TOTAL_DE_POSICIONES;
-    
-    
-    //Imagenes
-    public Image img_uno    = getToolkit().getImage(getClass().getResource("imagenes/1.png"));//---------------> 0
-    public Image img_suma   = getToolkit().getImage(getClass().getResource("imagenes/mas.png"));//-------------> 1
-    public Image img_resta  = getToolkit().getImage(getClass().getResource("imagenes/menos.png"));//-----------> 2
-    public Image img_multi  = getToolkit().getImage(getClass().getResource("imagenes/multiplicacion.png"));//--> 3
-    public Image img_divi   = getToolkit().getImage(getClass().getResource("imagenes/division.png"));//--------> 4
-    public Image img_igual  = getToolkit().getImage(getClass().getResource("imagenes/igual.png"));//-----------> 5
-    public Image img_resid  = getToolkit().getImage(getClass().getResource("imagenes/r.png"));//---------------> 6
-    public Image img_x_ree  = getToolkit().getImage(getClass().getResource("imagenes/x.png"));//---------------> 7
-    public Image img_numer  = getToolkit().getImage(getClass().getResource("imagenes/numeral.png"));//---------> 8
-    
-    
-    
-    private ArrayList<Cuadro> CINTA = new ArrayList<Cuadro>();
-    private ArrayList<Cuadro> CINTA_EN_BLANCO = new ArrayList<Cuadro>();
-    private ArrayList<Image> IMGS = new ArrayList<Image>();
-    
+    private int CABEZAL = 0;
+    private ArrayList<String> CINTA_STRING = new ArrayList<String>();
     
     
     
@@ -54,6 +31,7 @@ public class MaquinaDeTuring extends JPanel{
         this.CADENA = cadena;
         setLayout(null);
         setSize(anchoVentana, altoventana);
+        
         procesarDatosLlegada();
         
     }
@@ -97,20 +75,6 @@ public class MaquinaDeTuring extends JPanel{
             
         }
         
-        
-        
-        if(PINTAR_CINTA_EN_BLANCO){
-            for(int i = 0; i< CINTA_EN_BLANCO.size(); i++){
-                g.drawImage(IMGS.get(CINTA_EN_BLANCO.get(i).getImagen()), CINTA_EN_BLANCO.get(i).getCoorX(), CINTA_EN_BLANCO.get(i).getCoorY(), CINTA_EN_BLANCO.get(i).getAncho(), CINTA_EN_BLANCO.get(i).getAlto(), this);
-                System.out.println("Pinto " + i);
-            }
-            System.err.println("-----------------");
-        }//Fin del que pinta la cinta vacia
-        
-        
-        
-        
-        
     }//Fin del metodo pain
 
 
@@ -133,6 +97,7 @@ public class MaquinaDeTuring extends JPanel{
         
         
         
+        
         cad1 = this.CADENA.substring(0, this.CADENA.indexOf(op));
         cad2 = this.CADENA.substring(this.CADENA.indexOf(op)+1, this.CADENA.length());
         
@@ -146,6 +111,26 @@ public class MaquinaDeTuring extends JPanel{
         this.OPERACION = op;
         this.NUMERO_1 = Integer.parseInt(cad1);
         this.NUMERO_2 = Integer.parseInt(cad2);
+        
+        //Llenamos la cinta de String
+        //Primer elemento
+        CINTA_STRING.add("#");
+        //Los primeros unos
+        for(int i = 0; i<this.NUMERO_1; i++){
+            CINTA_STRING.add("1");
+        }
+        //Añadimos el simbolo de la operacion
+        CINTA_STRING.add(op);
+        //Los segundos unos
+        for(int i = 0; i<this.NUMERO_2; i++){
+            CINTA_STRING.add("1");
+        }
+        //Ultimo caracter
+        for(int i = 0; i<100; i++){
+            CINTA_STRING.add("#");
+        }
+        
+        
         
         System.out.print(this.CADENA + " = ");
         switch(op){
@@ -174,132 +159,242 @@ public class MaquinaDeTuring extends JPanel{
         if(op.equals("/") && this.RESIDUO != 0) this.NUMERO_TOTAL_DE_POSICIONES += this.RESIDUO + 1;
         System.err.println("Numero toral de posiciones: " + NUMERO_TOTAL_DE_POSICIONES);
         
-        iniciarComponentes();
-        
+//        for(int i = 0; i<this.CINTA_STRING.size(); i++){
+//            System.out.print(" " + CINTA_STRING.get(i));
+//        }
+        sumaNodo1();
     }//Fin del metodo procesar datos
 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    public void iniciarComponentes(){
-        
-        this.anchoCuadro = anchoVentana/NUMERO_TOTAL_DE_POSICIONES;
-        this.altoCuadro = 100;
-        
-        if(anchoCuadro>100){
-            anchoCuadro = 100;
-        }
-        
-        
-        
-        int band = anchoCuadro * NUMERO_TOTAL_DE_POSICIONES;
-        int band2 = (anchoCuadro/2)-(band/2);
-        int contadorx = anchoCuadro;
-        
-        
-        IMGS.add(img_uno);
-        IMGS.add(img_suma);
-        IMGS.add(img_resta);
-        IMGS.add(img_multi);
-        IMGS.add(img_divi);
-        IMGS.add(img_igual);
-        IMGS.add(img_resid);
-        IMGS.add(img_x_ree);
-        IMGS.add(img_numer);
-        
-        for(int i = 0; i<this.NUMERO_1; i++){
-            CINTA.add(new Cuadro("1", anchoCuadro, altoCuadro, 0, contadorx, 203, false));
-            CINTA_EN_BLANCO.add(new Cuadro("#", anchoCuadro, altoCuadro, 8, contadorx, 203, false));
-            contadorx += anchoCuadro;
-            System.err.println("-------------------------------------------" + contadorx);
-        }
-        
-        
-        int indexOperacion = 0;
-        switch(this.OPERACION){
+    //Primer nodo
+    public void sumaNodo1(){
+        int siguiente_funcion = 0;
+        switch(CINTA_STRING.get(this.CABEZAL)){
+            case "#":
+                this.CINTA_STRING.set(CABEZAL, "#");
+                this.CABEZAL += 1;
+                siguiente_funcion = 1;
+                break;
+            case "1":
+                this.CINTA_STRING.set(CABEZAL, "X");
+                this.CABEZAL += 1;
+                siguiente_funcion = 1;
+                break;
             case "+":
-                indexOperacion = 1;
-                break;
-            case "-":
-                indexOperacion = 2;
-                break;
-            case "x":
-                indexOperacion = 3;
-                break;
-            case "/":
-                indexOperacion = 4;
+                this.CINTA_STRING.set(CABEZAL, "+");
+                this.CABEZAL += 1;
+                siguiente_funcion = 2;
                 break;
         }
-        CINTA.add(new Cuadro(this.OPERACION, anchoCuadro, altoCuadro, indexOperacion, (contadorx), 203, false));
-        CINTA_EN_BLANCO.add(new Cuadro("#", anchoCuadro, altoCuadro, 8, (contadorx), 203, false));
-        contadorx += anchoCuadro;
-        System.err.println("-------------------------------------------" + contadorx);
         
-        
-        
-        
-        for(int i = 0; i<this.NUMERO_2; i++){
-            CINTA.add(new Cuadro("1", anchoCuadro, altoCuadro, 0, (contadorx), 203, false));
-            CINTA_EN_BLANCO.add(new Cuadro("#", anchoCuadro, altoCuadro, 8, (contadorx), 203, false));
-            contadorx += anchoCuadro;
-            System.err.println("-------------------------------------------" + contadorx);
+        //Ahora dependiendo del valor que tomo la variable de siguiente funcion, se llama al roximo destino
+        //Se queda ahi mismo
+        if(siguiente_funcion == 1){
+            sumaNodo1();
+        }
+        //Pasa al nodo 2
+        if(siguiente_funcion == 2){
+            sumaNodo2();
+        }
+    }//Fin del primer nodo
+    
+    
+    
+    
+    
+    
+    //Segundo nodo
+    public void sumaNodo2(){
+        int siguiente_funcion = 0;
+        switch(CINTA_STRING.get(this.CABEZAL)){
+            case "1":
+                this.CINTA_STRING.set(CABEZAL, "X");
+                this.CABEZAL += 1;
+                siguiente_funcion = 2;
+                break;
+            case "#":
+                this.CINTA_STRING.set(CABEZAL, "=");
+                this.CABEZAL -= 1;
+                siguiente_funcion = 3;
+                break;
         }
         
-        
-        
-        
-        
-        
-        for(int i = 0; i< CINTA_EN_BLANCO.size(); i++){
-            System.out.println("Pocicion>" + i +": " +CINTA_EN_BLANCO.get(i).getImagen() +" - "+ CINTA_EN_BLANCO.get(i).getCoorX()+" - "+ CINTA_EN_BLANCO.get(i).getCoorY() +" - "+ CINTA_EN_BLANCO.get(i).getAncho()+" - "+ CINTA_EN_BLANCO.get(i).getAlto());
-            System.err.println();
+        //Ahora dependiendo del valor que tomo la variable de siguiente funcion, se llama al roximo destino
+        //Se queda ahi mismo
+        if(siguiente_funcion == 2){
+            sumaNodo2();
+        }
+        //Pasa al nodo 3
+        if(siguiente_funcion == 3){
+            sumaNodo3();
         }
         
-        String respuesta = controlEntradas.darResultado(indexOperacion, this.NUMERO_1, this.NUMERO_2);
+    }//Fin del segundo nodo
+    
+    
+    
+    
+    //Tercera nodo
+    public void sumaNodo3(){
+        int siguiente_funcion = 0;
+        switch(CINTA_STRING.get(this.CABEZAL)){
+            case "1":
+                this.CINTA_STRING.set(CABEZAL, "1");
+                this.CABEZAL -= 1;
+                siguiente_funcion = 3;
+                break;
+            case "X":
+                this.CINTA_STRING.set(CABEZAL, "X");
+                this.CABEZAL -= 1;
+                siguiente_funcion = 3;
+                break;
+            case "+":
+                this.CINTA_STRING.set(CABEZAL, "+");
+                this.CABEZAL -= 1;
+                siguiente_funcion = 3;
+                break;
+            case "=":
+                this.CINTA_STRING.set(CABEZAL, "=");
+                this.CABEZAL -= 1;
+                siguiente_funcion = 3;
+                break;
+            case "#":
+                this.CINTA_STRING.set(CABEZAL, "#");
+                this.CABEZAL += 1;
+                siguiente_funcion = 4;
+                break;
+        }
         
-        new IniciarOperacion().start();
-        
-    }//Fin de la funcion iniciar componentes
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    private class IniciarOperacion extends Thread{
-        public IniciarOperacion(){
+        //Ahora dependiendo del valor que tomo la variable de siguiente funcion, se llama al roximo destino
+        //Se queda ahi mismo
+        if(siguiente_funcion == 3){
+            sumaNodo3();
+        }
+        //Pasa al nodo 4
+        if(siguiente_funcion == 4){
+            sumaNodo4();
             
         }
         
+    }//Fin del tercer nodo
+    
+    
+    
+    //Cuarto nodo
+    public void sumaNodo4(){
+        int siguiente_funcion = 0;
+        switch(CINTA_STRING.get(this.CABEZAL)){
+            case "=":
+                this.CINTA_STRING.set(CABEZAL, "=");
+                //this.CABEZAL -= 1;
+                siguiente_funcion = 6;
+                break;
+            case "+":
+                this.CINTA_STRING.set(CABEZAL, "+");
+                this.CABEZAL += 1;
+                siguiente_funcion = 4;
+                break;
+            case "1":
+                this.CINTA_STRING.set(CABEZAL, "1");
+                this.CABEZAL += 1;
+                siguiente_funcion = 4;
+                break;
+            case "X":
+                this.CINTA_STRING.set(CABEZAL, "1");
+                this.CABEZAL += 1;
+                siguiente_funcion = 5;
+                break;
+        }
         
-        @Override
-        public void run(){
-            try {sleep(2000);} catch (InterruptedException ex) {}
-            CINTA_VACIA = true;
-            PINTAR_CINTA_EN_BLANCO = true;
-            repaint();
+        //Ahora dependiendo del valor que tomo la variable de siguiente funcion, se llama al roximo destino
+        //Se queda ahi mismo
+        if(siguiente_funcion == 4){
+            sumaNodo4();
+        }
+        //Pasa al nodo 5
+        if(siguiente_funcion == 5){
+            sumaNodo5();
             
         }
-    }//Fin de la clase privada IniciarOperacion
+        
+        //Pasa al nodo 6, el final
+        if(siguiente_funcion == 6){
+            sumaNodo6Final();
+        }
+        
+    }//Fin del cuarto nodo
     
-}//Fin de la clase principal
+    
+    
+    
+    
+    //Quinto nodo
+    public void sumaNodo5(){
+        int siguiente_funcion = 0;
+        switch(CINTA_STRING.get(this.CABEZAL)){
+            case "X":
+                this.CINTA_STRING.set(CABEZAL, "X");
+                this.CABEZAL += 1;
+                siguiente_funcion = 5;
+                break;
+            case "+":
+                this.CINTA_STRING.set(CABEZAL, "+");
+                this.CABEZAL += 1;
+                siguiente_funcion = 5;
+                break;
+            case "=":
+                this.CINTA_STRING.set(CABEZAL, "=");
+                this.CABEZAL += 1;
+                siguiente_funcion = 5;
+                break;
+            case "1":
+                this.CINTA_STRING.set(CABEZAL, "1");
+                this.CABEZAL += 1;
+                siguiente_funcion = 5;
+                break;
+            case "#":
+                this.CINTA_STRING.set(CABEZAL, "1");
+                this.CABEZAL -= 1;
+                siguiente_funcion = 3;
+                break;
+        }
+        
+        //Ahora dependiendo del valor que tomo la variable de siguiente funcion, se llama al roximo destino
+        //Se queda ahi mismo
+        if(siguiente_funcion == 5){
+            sumaNodo5();
+        }
+        
+        //Pasa al nodo 3, el final
+        if(siguiente_funcion == 3){
+            sumaNodo3();
+        }
+        
+    }//Fin del QUINTO nodo
+    
+    
+    
+    
+    
+    
+    //Quinto nodo
+    public void sumaNodo6Final(){
+        
+        
+        
+        for(int i = 0; i<this.CINTA_STRING.size(); i++){
+            if(i > 0 && CINTA_STRING.get(i).equals("#")){
+                System.out.print(" " + CINTA_STRING.get(i));
+                break;
+            }else{
+                System.out.print(" " + CINTA_STRING.get(i));
+            }
+                
+        }
+        //System.out.println("Cabezal = " + this.CABEZAL);
+        
+    }//Fin del SEXTO nodo el final
+    
+    
+    
+}//Fin de la clase
